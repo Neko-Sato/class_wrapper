@@ -5,13 +5,15 @@ T = TypeVar('T')
 class _Wrapper:
 	__wrapper_base_type__: Type[T]
 	__wrapper_base__: T
+	def __new__(cls, *args, **kwds) -> T:
+		self = super().__new__(cls)
+		self.__wrapper_base__ = self.__wrapper_base_type__(*args, **kwds)
+		return self
 	@classmethod
 	def from_instance(cls: Type[T], instance: T) -> T:
 		self = super().__new__(cls)
 		self.__wrapper_base__ = instance
 		return self
-	def __init__(self: T, *args, **kwds) -> None:
-		self.__wrapper_base__ = self.__wrapper_base_type__(*args, **kwds)
 	def __getattribute__(self: T, __name: str) -> Any:
 		try:
 			return super().__getattribute__(__name)
