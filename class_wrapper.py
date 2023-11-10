@@ -1,6 +1,16 @@
 from typing import TypeVar, Type, Any
+from copy import deepcopy
 
 T = TypeVar('T')
+
+class _TypeWrapper(type):
+	__wrapper_base_type__: Type[T]
+	def __getattribute__(cls: Type[T], __name: str) -> Any:
+		try:
+			return super().__getattribute__(__name)
+		except AttributeError:
+			pass
+		return getattr(cls.__wrapper_base_type__, __name)
 
 class _Wrapper:
 	__wrapper_base_type__: Type[T]
@@ -20,31 +30,15 @@ class _Wrapper:
 		except AttributeError:
 			pass
 		return self.__wrapper_base__.__getattribute__(__name)
-	def __setattr__(self: T, __name: str, __value: Any) -> None:
-		try:
-			return super().__setattr__(__name, __value)
-		except AttributeError:
-			pass
-		return self.__wrapper_base__.__setattr__(__name, __value)
-	def __class_getattribute__(cls: Type[T], __name: str) -> Any:
-		try:
-			return super().__class_getattribute__(__name)
-		except AttributeError:
-			pass
-		return cls.__wrapper_base_type__.__class_getattribute__(__name)
-	def __class_setattr__(cls: Type[T], __name: str, __value: Any) -> None:
-		try:
-			return super().__class_setattr__(__name, __value)
-		except AttributeError:
-			pass
-		return cls.__wrapper_base_type__.__class_setattr__(__name, __value)
 
 def ClassWrapper(_type: Type[T]) -> Type[T]:
-	class Wrapper(_Wrapper):
+	type_wrapper = deepcopy(_TypeWrapper)
+	type_wrapper.__wrapper_base_type__ = _type
+	class Wrapper(_Wrapper, metaclass=type_wrapper):
 		__wrapper_base_type__ = _type
 		__bases__ = _type, 
-		__name__ = _type.__name__
 		__qualname__ = f"{_Wrapper.__name__}[{_type.__qualname__}]"
+	Wrapper.__name__ = _type.__name__
 	return Wrapper
 
 def weak_instance(instance: T) -> T:
