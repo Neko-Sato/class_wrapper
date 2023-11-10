@@ -36,6 +36,7 @@ def ClassWrapper(_type: Type[T]) -> Type[T]:
 	type_wrapper.__wrapper_base_type__ = _type
 	class Wrapper(_Wrapper, metaclass=type_wrapper):
 		__wrapper_base_type__ = _type
+		__base__ = _type
 		__bases__ = _type, 
 		__qualname__ = f"{_Wrapper.__name__}[{_type.__qualname__}]"
 	Wrapper.__name__ = _type.__name__
