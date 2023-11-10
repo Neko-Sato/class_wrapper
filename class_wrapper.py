@@ -5,7 +5,7 @@ T = TypeVar('T')
 class _Wrapper:
 	__wrapper_base_type__: Type[T]
 	__wrapper_base__: T
-	def __new__(cls, *args, **kwds) -> T:
+	def __new__(cls: Type[T], *args, **kwds) -> T:
 		self = super().__new__(cls)
 		self.__wrapper_base__ = self.__wrapper_base_type__(*args, **kwds)
 		return self
