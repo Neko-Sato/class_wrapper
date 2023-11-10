@@ -38,10 +38,10 @@ def ClassWrapper(_type: Type[T]) -> Type[T]:
 	type_wrapper.__wrapper_base_type__ = _type
 	class Wrapper(_Wrapper, metaclass=type_wrapper):
 		__wrapper_base_type__ = _type
-		__base__ = _type
-		__bases__ = _type, 
+		__class__ = _type
+		__base__ = _type.__base__
+		__bases__ = _type.__bases__
 		__qualname__ = f"{_Wrapper.__name__}[{_type.__qualname__}]"
-	Wrapper.__name__ = _type.__name__
 	return Wrapper
 
 def weak_instance(instance: T) -> T:
