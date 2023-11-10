@@ -24,6 +24,8 @@ class _Wrapper:
 		self = super().__new__(cls)
 		self.__wrapper_base__ = instance
 		return self
+	def __repr__(self) -> str:
+		return self.__wrapper_base__.__repr__()
 	def __getattribute__(self: T, __name: str) -> Any:
 		try:
 			return super().__getattribute__(__name)
